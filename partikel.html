@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentasi Kimia: Partikel dan Muatan</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 1;
+            overflow-y: auto;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            z-index: 2;
+        }
+        
+        .slide-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .slide-content {
+            font-size: 1.5rem;
+            max-width: 900px;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .slide-counter {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 100;
+        }
+        
+        /* Background variations */
+        .bg-black {
+            background: radial-gradient(circle at center, #1a1a1a, #000000);
+        }
+        
+        .bg-white {
+            background: radial-gradient(circle at center, #f0f0f0, #d0d0d0);
+            color: #333;
+        }
+        
+        .bg-blue {
+            background: radial-gradient(circle at center, #1a2a6c, #0d1b4d);
+        }
+        
+        .bg-gray {
+            background: radial-gradient(circle at center, #404040, #2a2a2a);
+        }
+        
+        /* Atom Visualization */
+        .atom-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+        }
+        
+        .nucleus {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, #ff4d4d, #b21f1f);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+        
+        .electron {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle at 30% 30%, #4d79ff, #1a2a6c);
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0, 100, 255, 0.7);
+            z-index: 5;
+        }
+        
+        .orbit-1 {
+            width: 150px;
+            height: 150px;
+            animation: rotate 15s linear infinite;
+        }
+        
+        .orbit-2 {
+            width: 220px;
+            height: 220px;
+            animation: rotate 20s linear infinite reverse;
+        }
+        
+        .orbit-3 {
+            width: 300px;
+            height: 300px;
+            animation: rotate 25s linear infinite;
+        }
+        
+        .electron-1 {
+            top: -7.5px;
+            left: 50%;
+            margin-left: -7.5px;
+        }
+        
+        .electron-2 {
+            top: 50%;
+            right: -7.5px;
+            margin-top: -7.5px;
+        }
+        
+        .electron-3 {
+            bottom: -7.5px;
+            left: 50%;
+            margin-left: -7.5px;
+        }
+        
+        .electron-4 {
+            top: 50%;
+            left: -7.5px;
+            margin-top: -7.5px;
+        }
+        
+        .electron-5 {
+            top: 15%;
+            right: 15%;
+        }
+        
+        .electron-6 {
+            bottom: 15%;
+            right: 15%;
+        }
+        
+        .electron-7 {
+            bottom: 15%;
+            left: 15%;
+        }
+        
+        .electron-8 {
+            top: 15%;
+            left: 15%;
+        }
+        
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        /* Particle Info */
+        .particles-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .particle-item {
+            text-align: center;
+            width: 140px;
+        }
+        
+        .particle-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .proton-icon {
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #b21f1f);
+        }
+        
+        .neutron-icon {
+            background: radial-gradient(circle at 30% 30%, #a0a0a0, #606060);
+        }
+        
+        .electron-icon {
+            background: radial-gradient(circle at 30% 30%, #6b8cff, #1a2a6c);
+        }
+        
+        /* Comparison Table */
+        .comparison-table {
+            width: 90%;
+            max-width: 900px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            font-size: 1.2rem;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .comparison-table th {
+            background-color: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Copyright */
+        .copyright {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            z-index: 100;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .slide-title {
+                font-size: 2rem;
+            }
+            
+            .slide-content {
+                font-size: 1.2rem;
+            }
+            
+            .atom-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .orbit-1 {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .orbit-2 {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .orbit-3 {
+                width: 240px;
+                height: 240px;
+            }
+            
+            .electron {
+                width: 12px;
+                height: 12px;
+            }
+            
+            .particles-info {
+                gap: 20px;
+            }
+            
+            .particle-item {
+                width: 120px;
+            }
+            
+            .comparison-table {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .slide-title {
+                font-size: 1.8rem;
+            }
+            
+            .slide-content {
+                font-size: 1rem;
+            }
+            
+            .atom-container {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .orbit-1 {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .orbit-2 {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .orbit-3 {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .electron {
+                width: 10px;
+                height: 10px;
+            }
+            
+            .particles-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .particle-item {
+                width: 100%;
+            }
+            
+            .comparison-table {
+                font-size: 0.9rem;
+            }
+            
+            .comparison-table th, .comparison-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title -->
+    <div class="slide bg-black active" id="slide1">
+        <h1 class="slide-title">Partikel dan Muatan dalam Kimia</h1>
+        <p class="slide-content">Presentasi Interaktif tentang Struktur Atom dan Sifat Muatan</p>
+        
+        <div class="atom-container">
+            <div class="nucleus">INTI ATOM</div>
+            <div class="orbit orbit-1">
+                <div class="electron electron-1"></div>
+                <div class="electron electron-2"></div>
+            </div>
+            <div class="orbit orbit-2">
+                <div class="electron electron-3"></div>
+                <div class="electron electron-4"></div>
+            </div>
+            <div class="orbit orbit-3">
+                <div class="electron electron-5"></div>
+                <div class="electron electron-6"></div>
+                <div class="electron electron-7"></div>
+                <div class="electron electron-8"></div>
+            </div>
+        </div>
+        
+        <p class="slide-content">Gunakan tombol Next untuk melanjutkan presentasi</p>
+    </div>
+    
+    <!-- Slide 2: Apa itu Partikel? -->
+    <div class="slide bg-white" id="slide2">
+        <h1 class="slide-title">Apa itu Partikel?</h1>
+        <p class="slide-content">Partikel adalah komponen dasar penyusun materi dalam kimia</p>
+        
+        <div class="particles-info">
+            <div class="particle-item">
+                <div class="particle-icon proton-icon">p+</div>
+                <h3>Proton</h3>
+                <p>Partikel bermuatan positif</p>
+                <p>Massa: 1.67×10⁻²⁷ kg</p>
+            </div>
+            <div class="particle-item">
+                <div class="particle-icon neutron-icon">n⁰</div>
+                <h3>Neutron</h3>
+                <p>Partikel tidak bermuatan</p>
+                <p>Massa: 1.67×10⁻²⁷ kg</p>
+            </div>
+            <div class="particle-item">
+                <div class="particle-icon electron-icon">e-</div>
+                <h3>Elektron</h3>
+                <p>Partikel bermuatan negatif</p>
+                <p>Massa: 9.11×10⁻³¹ kg</p>
+            </div>
+        </div>
+        
+        <p class="slide-content">Partikel subatomik membentuk atom, yang merupakan unit dasar semua materi</p>
+    </div>
+    
+    <!-- Slide 3: Apa itu Muatan? -->
+    <div class="slide bg-blue" id="slide3">
+        <h1 class="slide-title">Apa itu Muatan?</h1>
+        <p class="slide-content">Muatan adalah sifat fisika yang menentukan interaksi elektromagnetik</p>
+        
+        <div class="atom-container">
+            <div class="nucleus">+</div>
+            <div class="orbit orbit-1">
+                <div class="electron electron-1">-</div>
+                <div class="electron electron-2">-</div>
+            </div>
+            <div class="orbit orbit-2">
+                <div class="electron electron-3">-</div>
+                <div class="electron electron-4">-</div>
+            </div>
+        </div>
+        
+        <p class="slide-content">Muatan positif (proton) dan negatif (elektron) saling tarik-menarik</p>
+        <p class="slide-content">Muatan sejenis tolak-menolak</p>
+        <p class="slide-content">Muatan elementer: 1.602 × 10⁻¹⁹ Coulomb</p>
+    </div>
+    
+    <!-- Slide 4: Perbandingan Partikel -->
+    <div class="slide bg-gray" id="slide4">
+        <h1 class="slide-title">Perbandingan Partikel Subatomik</h1>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Partikel</th>
+                    <th>Muatan</th>
+                    <th>Massa</th>
+                    <th>Lokasi</th>
+                    <th>Peran</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Proton</td>
+                    <td>+1.6×10⁻¹⁹ C</td>
+                    <td>1.67×10⁻²⁷ kg</td>
+                    <td>Inti Atom</td>
+                    <td>Menentukan unsur</td>
+                </tr>
+                <tr>
+                    <td>Neutron</td>
+                    <td>0 (netral)</td>
+                    <td>1.67×10⁻²⁷ kg</td>
+                    <td>Inti Atom</td>
+                    <td>Menstabilkan inti</td>
+                </tr>
+                <tr>
+                    <td>Elektron</td>
+                    <td>-1.6×10⁻¹⁹ C</td>
+                    <td>9.11×10⁻³¹ kg</td>
+                    <td>Mengelilingi Inti</td>
+                    <td>Membentuk ikatan</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <p class="slide-content">Proton dan neutron membentuk inti atom, sementara elektron mengelilingi inti</p>
+    </div>
+    
+    <!-- Slide 5: Signifikansi dalam Kimia -->
+    <div class="slide bg-black" id="slide5">
+        <h1 class="slide-title">Signifikansi dalam Kimia</h1>
+        
+        <div class="particles-info">
+            <div class="particle-item">
+                <div class="particle-icon proton-icon">+</div>
+                <h3>Kation</h3>
+                <p>Ion bermuatan positif</p>
+                <p>Contoh: Na⁺, Ca²⁺</p>
+            </div>
+            <div class="particle-item">
+                <div class="particle-icon electron-icon">-</div>
+                <h3>Anion</h3>
+                <p>Ion bermuatan negatif</p>
+                <p>Contoh: Cl⁻, O²⁻</p>
+            </div>
+        </div>
+        
+        <p class="slide-content">Muatan menentukan:</p>
+        <p class="slide-content">• Ikatan kimia (ionik, kovalen)</p>
+        <p class="slide-content">• Sifat asam-basa (pH)</p>
+        <p class="slide-content">• Kelarutan senyawa</p>
+        <p class="slide-content">• Reaksi redoks</p>
+    </div>
+    
+    <!-- Slide 6: Kesimpulan -->
+    <div class="slide bg-white" id="slide6">
+        <h1 class="slide-title">Kesimpulan</h1>
+        
+        <div class="atom-container">
+            <div class="nucleus">+</div>
+            <div class="orbit orbit-1">
+                <div class="electron electron-1">-</div>
+                <div class="electron electron-2">-</div>
+            </div>
+            <div class="orbit orbit-2">
+                <div class="electron electron-3">-</div>
+                <div class="electron electron-4">-</div>
+            </div>
+            <div class="orbit orbit-3">
+                <div class="electron electron-5">-</div>
+                <div class="electron electron-6">-</div>
+                <div class="electron electron-7">-</div>
+                <div class="electron electron-8">-</div>
+            </div>
+        </div>
+        
+        <p class="slide-content">• Partikel adalah entitas fisik, muatan adalah sifat</p>
+        <p class="slide-content">• Interaksi muatan mendasari semua reaksi kimia</p>
+        <p class="slide-content">• Pemahaman partikel dan muatan penting untuk memprediksi sifat materi</p>
+        <p class="slide-content">• Atom terdiri dari inti bermuatan positif dan elektron bermuatan negatif</p>
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="controls">
+        <button class="btn" id="prevBtn">Previous</button>
+        <button class="btn" id="nextBtn">Next</button>
+    </div>
+    
+    <!-- Slide Counter -->
+    <div class="slide-counter">
+        <span id="currentSlide">1</span> / <span id="totalSlides">6</span>
+    </div>
+    
+    <!-- Copyright -->
+    <div class="copyright">
+        &copy; 2023 zyee - Presentasi Kimia: Partikel dan Muatan
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const currentSlideEl = document.getElementById('currentSlide');
+            const totalSlidesEl = document.getElementById('totalSlides');
+            
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            
+            // Initialize total slides counter
+            totalSlidesEl.textContent = totalSlides;
+            
+            // Function to show a specific slide
+            function showSlide(index) {
+                // Validate index
+                if (index < 0 || index >= totalSlides) return;
+                
+                // Hide all slides
+                slides.forEach(slide => {
+                    slide.classList.remove('active');
+                });
+                
+                // Show the current slide
+                slides[index].classList.add('active');
+                
+                // Update slide counter
+                currentSlideEl.textContent = index + 1;
+                
+                // Update button states
+                prevBtn.disabled = index === 0;
+                nextBtn.disabled = index === totalSlides - 1;
+                
+                // Update current slide
+                currentSlide = index;
+            }
+            
+            // Function to go to next slide
+            function nextSlide() {
+                if (currentSlide < totalSlides - 1) {
+                    showSlide(currentSlide + 1);
+                }
+            }
+            
+            // Function to go to previous slide
+            function prevSlide() {
+                if (currentSlide > 0) {
+                    showSlide(currentSlide - 1);
+                }
+            }
+            
+            // Event listeners for buttons
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                // Prevent default behavior for arrow keys and space
+                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === ' ') {
+                    e.preventDefault();
+                }
+                
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+            
+            // Touch swipe support for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            document.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            
+            document.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    // Swipe left - next slide
+                    nextSlide();
+                }
+                
+                if (touchEndX > touchStartX + swipeThreshold) {
+                    // Swipe right - previous slide
+                    prevSlide();
+                }
+            }
+            
+            // Initialize the presentation
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
